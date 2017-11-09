@@ -1,0 +1,71 @@
+/* Bring me Ragnarok!! */
+
+import domino.*
+
+describe "Aguante Thor" {
+	var thor
+	var loki
+	var tierra
+	var unaExpedicion
+	var unaCapital
+	var unaAldea
+	var ragnar
+	
+	fixture {
+		thor = new Soldado(thrall)
+		loki = new Granjero(thrall)
+		unaCapital = new Capital(2,20)
+		tierra = new Expedicion(#{unaCapital})
+		unaAldea = new Aldea(20)
+		unaExpedicion = new Expedicion(#{unaAldea})
+		tierra.subirVikingo(loki)
+		unaExpedicion.subirVikingo(loki)
+		
+		ragnar = new Soldado(karl)
+	}
+	
+	test "Tira error cuando intento subir un soldado a una expedicion cuando no cumple con las condiciones"{
+		assert.throwsExceptionWithType(new NoPuedoSubirVikingoException(),{tierra.subirVikingo(thor)})
+	}
+	
+	test "Una expedicion cuando si vale la pena, te informa correctamente"{
+		
+		assert.that(unaExpedicion.valgoLaPena())
+	}
+	
+	test "Una expedicion cuando no vale la pena, te informa correctamente"{
+		assert.notThat(tierra.valgoLaPena())
+	}
+	
+	test "Cuando se realiza una expedicion se aumenta correctamente el oro de cada vikingo"{
+		unaExpedicion.realizarme()
+		assert.equals(20,loki.oro())
+	}
+	
+	test "Cuando se realiza una expedicion se aumenta correctamente la cantidad de vidas tomadas de cada vikingo"{
+		thor.armas(1)
+		thor.vidasTomadas(21) // tengo que setear a thor para que pueda subir a la expedicion y de esta forma calcular que esta bien la cantidad de vidas que el tomo
+		tierra.subirVikingo(thor)
+		tierra.realizarme()
+		assert.equals(22,thor.vidasTomadas())
+	}
+	
+	test "Cuando se realiza una expedicion se afecta correctamente cada Ciudad"{
+		thor.armas(1)
+		thor.vidasTomadas(21) // tengo que setear a thor para que pueda subir a la expedicion y de esta forma calcular que se modifique la cantidad de defensores
+		tierra.subirVikingo(thor)
+		tierra.realizarme()
+		assert.equals(18,unaCapital.defensores()) //como en la expedicion estan loki y thor, matan a 2 defensores
+	}
+	
+	test "Cuando se realiza una expedicion se afecta correctamente cada Aldea"{
+		unaExpedicion.realizarme()
+		assert.equals(0,unaAldea.cantTotalDeCrucificos())
+	}
+	
+	test "Cuando un vikingo escalar socialmente cambia su casta"{
+		ragnar.ascender()
+		assert.equals(thrall,ragnar.casta())
+	}
+	
+}
